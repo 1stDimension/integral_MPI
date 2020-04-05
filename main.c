@@ -30,11 +30,12 @@ int main(int argc, char ** argv){
     double begin = atof(argv[1]);
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
-    // int slave_batch = ;
+    int slave_batch = number_of_points/world_size;
+    int master_batch = number_of_points % world_size;
+    printf("slave batch = %d", slave_batch);
+    printf("master batch = %d", master_batch);
   } else {
-    int my_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-    printf("I'm slave nr %d\n", my_rank);
+    printf("I'm slave nr %d\n", rank);
   }
 
   MPI_Finalize();
