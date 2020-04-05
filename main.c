@@ -13,8 +13,7 @@ int main(int argc, char ** argv){
   // printf("f(begin) is %g f(end) is %g \n", (*func_ptr)(begin) , (*func_ptr)(end));
   // printf("Integral is %g\n", result);
 
-  printf("MPI Environment begins\n");
-  MPI_Init(NULL, NULL);
+  MPI_Init(&argc, &argv);
 
   int world_size, rank;
   //How many processes
