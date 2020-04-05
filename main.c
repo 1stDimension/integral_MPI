@@ -24,6 +24,13 @@ int main(int argc, char ** argv){
 
   if(rank == 0){
     printf("I'm master\n");
+    if (argc != 4){
+      printf("Not sufficient arguments");
+      exit(EXIT_FAILURE);
+    }
+    double begin = atof(argv[1]);
+    double end = atof(argv[2]);
+    int number_of_points = atoi(argv[3]);
     // int slave_batch = ;
   } else {
     int my_rank;
