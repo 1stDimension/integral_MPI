@@ -23,6 +23,7 @@ int main(int argc, char ** argv){
 
   if(rank == 0){
     printf("I'm master\n");
+    printf("World size = %d\n", world_size);
     if (argc != 4){
       printf("Not sufficient arguments");
       exit(EXIT_FAILURE);
