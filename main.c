@@ -38,6 +38,5 @@ int main(int argc, char ** argv){
   }
 
   MPI_Finalize();
-  printf("MPI Environment end\n");
   return 0;
 }
