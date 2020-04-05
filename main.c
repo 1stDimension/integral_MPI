@@ -23,7 +23,7 @@ int main(int argc, char ** argv){
 
   if(rank == 0){
     printf("I'm master\n");
-
+    
     printf("World size = %d\n", world_size);
     if (argc != 4){
       printf("Not sufficient arguments");
@@ -42,8 +42,8 @@ int main(int argc, char ** argv){
       // send to i their begin and end and num points
       double b,e;
       int p;
-      b = begin + (i -1) * step
-      e = end + i * step
+      b = begin + (i -1) * step;
+      e = end + i * step;
       p = slave_batch + 1;
       printf("b = %g e = %g p = %d\n", b,e,p);
     }
