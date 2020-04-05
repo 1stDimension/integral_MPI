@@ -48,9 +48,9 @@ int main(int argc, char ** argv){
       p = slave_batch + 1;
       printf("b = %g e = %g p = %d\n", b,e,p);
     }
-    m_b = begin + (world_size - 1) * step;
-    m_e = end;
-    m_p = master_batch + 1;
+    double m_b = begin + (world_size - 1) * step;
+    double m_e = end;
+    int m_p = master_batch + 1;
     printf("m_b = %g m_e = %g m_p = %d", m_b, m_e, m_p);
   } else {
     printf("I'm slave nr %d\n", rank);
