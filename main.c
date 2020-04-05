@@ -51,7 +51,7 @@ int main(int argc, char ** argv){
     double m_b = begin + (world_size - 1) * step;
     double m_e = end;
     int m_p = master_batch + 1;
-    printf("m_b = %g m_e = %g m_p = %d", m_b, m_e, m_p);
+    printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
   } else {
     printf("I'm slave nr %d\n", rank);
   }
