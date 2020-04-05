@@ -32,8 +32,8 @@ int main(int argc, char ** argv){
     int number_of_points = atoi(argv[3]);
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
-    printf("slave batch = %d", slave_batch);
-    printf("master batch = %d", master_batch);
+    printf("slave batch = %d\n", slave_batch);
+    printf("master batch = %d\n", master_batch);
   } else {
     printf("I'm slave nr %d\n", rank);
   }
