@@ -30,10 +30,21 @@ int main(int argc, char ** argv){
     double begin = atof(argv[1]);
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
+    int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
+    double step = (end - begin)/number_of_regions; 
     printf("slave batch = %d\n", slave_batch);
     printf("master batch = %d\n", master_batch);
+    for(int i = 1; i < world_size; i++){
+      // send to i their begin and end and num points
+      double b,e;
+      int p;
+      b = begin + (i -1) * step
+      e = end + i * step
+      p = slave_batch + 1;
+      printf("\n");
+    }
   } else {
     printf("I'm slave nr %d\n", rank);
   }
