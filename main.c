@@ -38,6 +38,7 @@ int main(int argc, char ** argv){
     double step = (end - begin)/number_of_regions; 
     printf("slave batch = %d\n", slave_batch);
     printf("master batch = %d\n", master_batch);
+    printf("step = %g",step);
     for(int i = 1; i < world_size; i++){
       // send to i their begin and end and num points
       double b,e;
