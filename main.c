@@ -43,7 +43,7 @@ int main(int argc, char ** argv){
       double b,e;
       int p;
       b = begin + (i -1) * step;
-      e = end + i * step;
+      e = begin + i * step;
       p = slave_batch + 1;
       printf("b = %g e = %g p = %d\n", b,e,p);
     }
