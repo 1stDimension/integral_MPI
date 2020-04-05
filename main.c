@@ -35,7 +35,7 @@ int main(int argc, char ** argv){
     int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
-    master_batch = master_batch == 0 ? slave_batch : master_batch + slave_batch;
+    master_batch = master_batch == 0 ? slave_batch - 1 : slave_batch;
     double step = (end - begin)/world_size; 
     printf("slave batch = %d\n", slave_batch);
     printf("master batch = %d\n", master_batch);
@@ -54,7 +54,7 @@ int main(int argc, char ** argv){
     int m_p = master_batch + 1;
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
   } else {
-    printf("I'm slave nr %d\n", rank);
+    // printf("I'm slave nr %d\n", rank);
   }
 
   MPI_Finalize();
