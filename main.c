@@ -44,7 +44,7 @@ int main(int argc, char ** argv){
       b = begin + (i -1) * step
       e = end + i * step
       p = slave_batch + 1;
-      printf("\n");
+      printf("b = %g e = %g p = %d\n", b,e,p);
     }
   } else {
     printf("I'm slave nr %d\n", rank);
