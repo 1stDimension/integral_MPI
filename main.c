@@ -69,7 +69,12 @@ int main(int argc, char **argv)
     }
     double m_b = begin + (world_size - 1) * step;
     double m_e = end;
-    int m_p = 1;
+    int m_p = (number_of_points - last_point_number + 1);
+    double partial_integral = 0.0;
+    if (m_p > 1)
+    {
+      partial_integral = integrate(func_ptr, m_b, m_e, m_p);
+    }
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
   }
 }
