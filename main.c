@@ -39,7 +39,7 @@ int main(int argc, char ** argv){
     int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
-    master_batch = master_batch == 0 ? slave_batch - 1 : slave_batch;
+    master_batch = master_batch == 0 ? slave_batch - 1 : master_batch;
 
     double m = world_size * (slave_batch + 1);
 
