@@ -97,6 +97,6 @@ int main(int argc, char **argv)
     MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
   }
 
-MPI_Finalize();
-return 0;
+  MPI_Finalize();
+  return 0;
 }
