@@ -68,8 +68,15 @@ int main(int argc, char **argv)
 }
 else
 {
-  // printf("I'm slave nr %d\n", rank);
-}
+    double begin, end;
+    int number_points;
+    MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&end, 1, MPI_DOUBLE, MASTER_ID, END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&number_points, 1, MPI_INT, MASTER_ID, NUM_POINTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    printf("I'm slave nr %d received begin = %g, end = %g, number_points = %d\n", rank, begin, end, number_points);
+    double partial_Integral = integrate(func_ptr, begin, end, number_points);
+    MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
+  }
 
 MPI_Finalize();
 return 0;
