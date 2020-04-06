@@ -32,6 +32,10 @@ int main(int argc, char ** argv){
     double begin = atof(argv[1]);
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
+
+    if (number_of_points == 2 && world_size == 2){
+      
+    }
     int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
