@@ -13,7 +13,7 @@
 int main(int argc, char **argv)
 {
 
-  double (*func_ptr)(double) = &linear;
+  double (*func_ptr)(double) = &parabole;
 
   MPI_Init(&argc, &argv);
 
