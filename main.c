@@ -37,29 +37,8 @@ int main(int argc, char ** argv){
     int slave_batch = number_of_points/world_size;
     int master_batch = number_of_points % world_size;
 
-    if (master_batch != 0) {
       double m = world_size * (slave_batch + 1);
 
-      double step = (end - begin)/(world_size); 
-      printf("slave batch = %d\n", slave_batch);
-      printf("master batch = %d\n", master_batch);
-      printf("step = %g\n",step);
-      for(int i = 1; i < world_size; i++){
-        // send to i their begin and end and num points
-        double b,e;
-        int p;
-        b = begin + (i -1) * step;
-        e = begin + i * step;
-        p = slave_batch + 1;
-        printf("b = %g e = %g p = %d\n", b,e,p);
-      }
-      double m_b = begin + (world_size - 1) * step;
-      double m_e = end;
-      int m_p = master_batch + 1;
-      printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
-    } else {
-
-      master_batch = slave_batch -1;
       double step = (end - begin)/(world_size); 
       printf("slave batch = %d\n", slave_batch);
       printf("master batch = %d\n", master_batch);
