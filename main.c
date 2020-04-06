@@ -44,9 +44,10 @@ int main(int argc, char **argv)
     {
       step = (end - begin) / (world_size - 1);
     }
-
+#ifdef
     printf("slave batch = %d\n", slave_batch);
     printf("step = %g\n", step);
+#endif
     int last_point_number = 1;
     for (int i = 1; i < world_size; i++)
     {
@@ -57,7 +58,9 @@ int main(int argc, char **argv)
       e = begin + i * step;
       p = slave_batch + 1;
       last_point_number += slave_batch;
+#ifdef DEBUG
       printf("b = %g e = %g p = %d\n", b, e, p);
+#endif
       MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
       MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
       MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
@@ -70,8 +73,9 @@ int main(int argc, char **argv)
     {
       partial_integral = integrate(func_ptr, m_b, m_e, m_p);
     }
+#ifdef DEBUG
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
-    //Get data from slaves
+#endif
     for (int i = 1; i < world_size; i++)
     {
       double tmp;
@@ -87,7 +91,9 @@ int main(int argc, char **argv)
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(&end, 1, MPI_DOUBLE, MASTER_ID, END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(&number_points, 1, MPI_INT, MASTER_ID, NUM_POINTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+#ifdef DEBUG
     printf("I'm slave nr %d received begin = %g, end = %g, number_points = %d\n", rank, begin, end, number_points);
+#endif
     double partial_Integral = integrate(func_ptr, begin, end, number_points);
     MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
   }
