@@ -28,7 +28,7 @@ int main(int argc, char **argv)
   //Position inside processes
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  if (rank == 0)
+  if (rank == MASTER_ID)
   {
     printf("I'm master\n");
 
