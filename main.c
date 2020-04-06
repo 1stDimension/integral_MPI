@@ -42,14 +42,17 @@ int main(int argc, char **argv)
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
 
-    int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points / world_size;
+    double step = (end - begin) / world_size;
 
-    double m = world_size * (slave_batch + 1);
+    if (number_of_points == world_size)
+    {
+      step = (end - begin) / (world_size - 1);
+    }
 
-    double step = (end - begin) / (world_size);
     printf("slave batch = %d\n", slave_batch);
     printf("step = %g\n", step);
+    int last_point_number = 1;
     for (int i = 1; i < world_size; i++)
     {
       // send to i their begin and end and num points
@@ -58,6 +61,7 @@ int main(int argc, char **argv)
       b = begin + (i - 1) * step;
       e = begin + i * step;
       p = slave_batch + 1;
+      last_point_number += slave_batch;
       printf("b = %g e = %g p = %d\n", b, e, p);
     }
     double m_b = begin + (world_size - 1) * step;
