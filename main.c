@@ -76,10 +76,17 @@ int main(int argc, char **argv)
       partial_integral = integrate(func_ptr, m_b, m_e, m_p);
     }
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
+    //Get data from slaves
+    for (int i = 1; i < world_size; i++)
+    {
+      double tmp;
+      MPI_Recv(&tmp, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      partial_integral += tmp;
+    }
+    printf("Integral is equal to %g\n", partial_integral);
   }
-}
-else
-{
+  else
+  {
     double begin, end;
     int number_points;
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
