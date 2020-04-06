@@ -4,6 +4,12 @@
 
 #include "integrals.h"
 
+#define MASTER_ID 0
+#define BEGIN 0
+#define END 1
+#define NUM_POINTS 2
+#define RETURN_RESULTS 3
+
 int main(int argc, char **argv)
 {
 
