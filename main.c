@@ -40,10 +40,15 @@ int main(int argc, char **argv)
     int number_of_points = atoi(argv[3]);
 
     int slave_batch = number_of_points / world_size;
-    double step = (end - begin) / world_size;
+    double step;
 
     if (number_of_points == world_size)
     {
+      step = (end - begin) / (world_size - 1);
+    } else if (number_of_points > world_size){
+      step = (end - begin) / world_size;
+    } else if (number_of_points < world_size) {
+      world_size = number_of_points;
       step = (end - begin) / (world_size - 1);
     }
 #ifdef DEBUG
