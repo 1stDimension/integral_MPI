@@ -85,9 +85,7 @@ int main(int argc, char **argv)
       partial_integral += tmp;
     }
     printf("Integral is equal to %g\n", partial_integral);
-  }
-  else
-  {
+  } else {
     double begin, end;
     int number_points;
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
