@@ -38,13 +38,11 @@ int main(int argc, char **argv)
 
     int number_of_regions = number_of_points - 1;
     int slave_batch = number_of_points / world_size;
-    int master_batch = number_of_points % world_size;
 
     double m = world_size * (slave_batch + 1);
 
     double step = (end - begin) / (world_size);
     printf("slave batch = %d\n", slave_batch);
-    printf("master batch = %d\n", master_batch);
     printf("step = %g\n", step);
     for (int i = 1; i < world_size; i++)
     {
@@ -58,7 +56,7 @@ int main(int argc, char **argv)
     }
     double m_b = begin + (world_size - 1) * step;
     double m_e = end;
-    int m_p = master_batch + 1;
+    int m_p = 1;
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
   }
 }
