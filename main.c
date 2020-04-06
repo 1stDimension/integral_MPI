@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     {
       step = (end - begin) / (world_size - 1);
     }
-#ifdef
+#ifdef DEBUG
     printf("slave batch = %d\n", slave_batch);
     printf("step = %g\n", step);
 #endif
