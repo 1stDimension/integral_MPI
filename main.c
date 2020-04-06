@@ -25,9 +25,11 @@ int main(int argc, char **argv)
 
   if (rank == MASTER_ID)
   {
+#ifdef DEBUG
     printf("I'm master\n");
-
     printf("World size = %d\n", world_size);
+#endif
+
     if (argc != 4)
     {
       printf("Not sufficient arguments");
