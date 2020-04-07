@@ -58,7 +58,6 @@ int main(int argc, char **argv)
     int last_point_number = 1;
     for (int i = 1; i < calculate_world; i++)
     {
-      // send to i their begin and end and num points
       double b, e;
       int p;
       b = begin + (i - 1) * step;
@@ -68,6 +67,7 @@ int main(int argc, char **argv)
 #ifdef DEBUG
       printf("b = %g e = %g p = %d\n", b, e, p);
 #endif
+      // non blocking candidate
       MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
       MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
       MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
@@ -75,6 +75,7 @@ int main(int argc, char **argv)
     for (int i = calculate_world; i < world_size; i++){
       double tmp = 0;
       int zero = 0;
+      // non blocking candidate
       MPI_Send(&tmp, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
       MPI_Send(&tmp, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
       MPI_Send(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
@@ -104,11 +105,14 @@ int main(int argc, char **argv)
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(&end, 1, MPI_DOUBLE, MASTER_ID, END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(&number_points, 1, MPI_INT, MASTER_ID, NUM_POINTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    //insert guard
 #ifdef DEBUG
     printf("I'm slave nr %d received begin = %g, end = %g, number_points = %d\n", rank, begin, end, number_points);
 #endif
     double partial_Integral = integrate(func_ptr, begin, end, number_points);
-    MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
+    MPI_Request request;
+    MPI_Isend(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD, &request);
+    printf("Non blockking\n");
   }
 
   MPI_Finalize();
