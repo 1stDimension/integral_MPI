@@ -39,7 +39,6 @@ int main(int argc, char **argv)
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
 
-    int slave_batch = number_of_points / world_size;
     double step;
     int calculate_world = world_size;
     if (number_of_points == world_size)
@@ -51,6 +50,7 @@ int main(int argc, char **argv)
       calculate_world = number_of_points;
       step = (end - begin) / (calculate_world - 1);
     }
+    int slave_batch = number_of_points / calculate_world;
 #ifdef DEBUG
     printf("slave batch = %d\n", slave_batch);
     printf("step = %g\n", step);
