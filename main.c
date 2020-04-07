@@ -41,22 +41,22 @@ int main(int argc, char **argv)
 
     int slave_batch = number_of_points / world_size;
     double step;
-
+    int calculate_world = world_size;
     if (number_of_points == world_size)
     {
       step = (end - begin) / (world_size - 1);
     } else if (number_of_points > world_size){
       step = (end - begin) / world_size;
     } else if (number_of_points < world_size) {
-      world_size = number_of_points;
-      step = (end - begin) / (world_size - 1);
+      calculate_world = number_of_points;
+      step = (end - begin) / (calculate_world - 1);
     }
 #ifdef DEBUG
     printf("slave batch = %d\n", slave_batch);
     printf("step = %g\n", step);
 #endif
     int last_point_number = 1;
-    for (int i = 1; i < world_size; i++)
+    for (int i = 1; i < calculate_world; i++)
     {
       // send to i their begin and end and num points
       double b, e;
@@ -71,6 +71,14 @@ int main(int argc, char **argv)
       MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
       MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
       MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
+    }
+    for (int i = calculate_world; i < world_size; i++){
+      double tmp = 0;
+      int zero = 0;
+      MPI_Send(&tmp, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
+      MPI_Send(&tmp, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
+      MPI_Send(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
+
     }
     double m_b = begin + (world_size - 1) * step;
     double m_e = end;
