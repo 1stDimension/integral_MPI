@@ -38,15 +38,20 @@ int main(int argc, char **argv)
     double begin = atof(argv[1]);
     double end = atof(argv[2]);
     int number_of_points = atoi(argv[3]);
-
+    //Requests come in 3s begin, end, number_of_points
+    MPI_Request* send_requests = malloc(3 * (world_size - 1) * sizeof(*send_requests));
     double step;
     int calculate_world = world_size;
     if (number_of_points == world_size)
     {
       step = (end - begin) / (world_size - 1);
-    } else if (number_of_points > world_size){
+    }
+    else if (number_of_points > world_size)
+    {
       step = (end - begin) / world_size;
-    } else if (number_of_points < world_size) {
+    }
+    else if (number_of_points < world_size)
+    {
       calculate_world = number_of_points;
       step = (end - begin) / (calculate_world - 1);
     }
@@ -68,18 +73,18 @@ int main(int argc, char **argv)
       printf("b = %g e = %g p = %d\n", b, e, p);
 #endif
       // non blocking candidate
-      MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
-      MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
-      MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
+      MPI_Isend(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 0);
+      MPI_Isend(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 1);
+      MPI_Isend(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 2);
     }
-    for (int i = calculate_world; i < world_size; i++){
+    for (int i = calculate_world; i < world_size; i++)
+    {
       double tmp = 0;
       int zero = 0;
       // non blocking candidate
-      MPI_Send(&tmp, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
-      MPI_Send(&tmp, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
-      MPI_Send(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
-
+      MPI_Isend(&tmp, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 0);
+      MPI_Isend(&tmp, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 1);
+      MPI_Isend(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD, send_requests + 3 * (i-1) + 2);
     }
     double m_b = begin + (calculate_world - 1) * step;
     double m_e = end;
@@ -92,14 +97,20 @@ int main(int argc, char **argv)
 #ifdef DEBUG
     printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
 #endif
+    double* received_request = malloc((world_size -1) * sizeof(*received_request));
     for (int i = 1; i < world_size; i++)
     {
-      double tmp;
-      MPI_Recv(&tmp, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      partial_integral += tmp;
+      MPI_Wait(send_request + i -1, MPI_STATUS_IGNORE);
+      MPI_Recv(received_request + i -1, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      // partial_integral += tmp;
+    }
+    for(int i = 0; i < world_size -1; i++){
+      partial_integral += *received_request;
     }
     printf("Integral is equal to %g\n", partial_integral);
-  } else {
+  }
+  else
+  {
     double begin, end;
     int number_points;
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -111,6 +122,7 @@ int main(int argc, char **argv)
 #endif
     double partial_Integral = integrate(func_ptr, begin, end, number_points);
     MPI_Request request;
+    // MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
     MPI_Isend(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD, &request);
     printf("Non blockking\n");
   }
