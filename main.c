@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     double* received_request = malloc((world_size -1) * sizeof(*received_request));
     for (int i = 1; i < world_size; i++)
     {
-      MPI_Wait(send_request + i -1, MPI_STATUS_IGNORE);
+      MPI_Wait(send_requests + i -1, MPI_STATUS_IGNORE);
       MPI_Recv(received_request + i -1, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       // partial_integral += tmp;
     }
