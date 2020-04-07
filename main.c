@@ -65,9 +65,9 @@ int main(int argc, char **argv)
       e = begin + i * step;
       p = slave_batch + 1;
       last_point_number += slave_batch;
-#ifdef DEBUG
+// #ifdef DEBUG
       printf("b = %g e = %g p = %d\n", b, e, p);
-#endif
+// #endif
       MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
       MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
       MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
