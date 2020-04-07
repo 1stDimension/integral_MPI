@@ -80,7 +80,7 @@ int main(int argc, char **argv)
       MPI_Send(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
 
     }
-    double m_b = begin + (world_size - 1) * step;
+    double m_b = begin + (calculate_world - 1) * step;
     double m_e = end;
     int m_p = (number_of_points - last_point_number + 1);
     double partial_integral = 0.0;
