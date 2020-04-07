@@ -4,7 +4,7 @@
 
 double integrate(double (*func)(double), double begin, double end, int num_points){
   if (num_points < 2){
-    printf("Too few point to calculate\n");
+    // printf("Too few point to calculate\n");
     return 0;
   }
   double step = (end - begin) / (double) (num_points - 1);
