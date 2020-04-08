@@ -23,13 +23,10 @@ int main(int argc, char **argv)
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
   //Position inside processes
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+  double *begin_end_array;
+  int *number_of_points_array;
   if (rank == MASTER_ID)
   {
-#ifdef DEBUG
-    printf("I'm master\n");
-    printf("World size = %d\n", world_size);
-#endif
 
     if (argc != 4)
     {
@@ -42,6 +39,9 @@ int main(int argc, char **argv)
 
     double step;
     int calculate_world = world_size;
+    begin_end_array = malloc(2 * world_size * sizeof(*begin_end_array));
+    number_of_points_array = malloc(world_size * sizeof(*number_of_points_array));
+
     if (number_of_points == world_size)
     {
       step = (end - begin) / (world_size - 1);
@@ -56,73 +56,49 @@ int main(int argc, char **argv)
       step = (end - begin) / (calculate_world - 1);
     }
     int slave_batch = number_of_points / calculate_world;
-#ifdef DEBUG
-    printf("slave batch = %d\n", slave_batch);
-    printf("step = %g\n", step);
-#endif
     int last_point_number = 1;
-    double *begin_end_array = malloc(2 * world_size * sizeof(*begin_end_array));
-    double *number_of_points_array = malloc(world_size * sizeof(*number_of_points_array));
 
     for (int i = 1; i < calculate_world; i++)
     {
       // send to i their begin and end and num points
-      double b, e;
-      int p;
-      b = begin + (i - 1) * step;
-      e = begin + i * step;
-      p = slave_batch + 1;
       last_point_number += slave_batch;
-#ifdef DEBUG
-      printf("b = %g e = %g p = %d\n", b, e, p);
-#endif
-      begin_end_array[i] = b;
-      begin_end_array[i + 1] = e;
-      number_of_points_array[i] = p;
+      begin_end_array[2*i] = begin + (i - 1) * step;
+      begin_end_array[2*i + 1] = begin + i * step;
+      number_of_points_array[i] = slave_batch + 1;
     }
     memset(number_of_points_array + calculate_world, 0, world_size - calculate_world);
     for (int i = calculate_world; i < world_size; i++)
     {
-      begin_end_array[i] = 0.0;
-      begin_end_array[i + 1] = 0.0;
+      begin_end_array[2*i] = 0.0;
+      begin_end_array[2*i + 1] = 0.0;
     }
-    double m_b = begin + (calculate_world - 1) * step;
-    double m_e = end;
-    int m_p = (number_of_points - last_point_number + 1);
+    begin_end_array[0] = begin + (calculate_world - 1) * step;
+    begin_end_array[1] = end;
+    number_of_points_array[0] = (number_of_points - last_point_number + 1);
+    // double partial_integral = 0.0;
 
-    begin_end_array[0] = m_b;
-    begin_end_array[1] = m_e;
-    number_of_points_array[0] = m_p;
-    double partial_integral = 0.0;
-    if (m_p > 1)
-    {
-      partial_integral = integrate(func_ptr, m_b, m_e, m_p);
-    }
-#ifdef DEBUG
-    printf("m_b = %g m_e = %g m_p = %d\n", m_b, m_e, m_p);
-#endif
-    for (int i = 1; i < world_size; i++)
-    {
-      double tmp;
-      MPI_Recv(&tmp, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      partial_integral += tmp;
-    }
-    printf("Integral is equal to %g\n", partial_integral);
+    // partial_integral = integrate(func_ptr, m_b, m_e, m_p);
+    // Replace with MPI_GATHER
+    // for (int i = 1; i < world_size; i++)
+    // {
+    // double tmp;
+    // MPI_Recv(&tmp, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    // partial_integral += tmp;
+    // }
   }
-  else
-  {
-    double begin, end;
-    int number_points;
-    MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    MPI_Recv(&end, 1, MPI_DOUBLE, MASTER_ID, END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    MPI_Recv(&number_points, 1, MPI_INT, MASTER_ID, NUM_POINTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-#ifdef DEBUG
-    printf("I'm slave nr %d received begin = %g, end = %g, number_points = %d\n", rank, begin, end, number_points);
-#endif
-    double partial_Integral = integrate(func_ptr, begin, end, number_points);
-    MPI_Send(&partial_Integral, 1, MPI_DOUBLE, MASTER_ID, RETURN_RESULTS, MPI_COMM_WORLD);
-  }
+  double *begin_end = malloc(2 * sizeof(begin_end));
+  int number_points;
+  MPI_Scatter(begin_end_array, 2, MPI_DOUBLE, begin_end, 2, MPI_DOUBLE, MASTER_ID, MPI_COMM_WORLD);
+  MPI_Scatter(number_of_points_array, 1, MPI_INT, &number_points, 1, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
 
+  // printf("I'm %d begin = %g, end = %g, number of points = %d\n",rank, begin_end[0], begin_end[1], number_points);
+  double partial_integral = integrate(func_ptr, begin_end[0], begin_end[1], number_points);
+  // printf("I'm %d partial integral is %g\n", rank,partial_integral);
+  double integral;
+  MPI_Reduce(&partial_integral,&integral, 1, MPI_DOUBLE, MPI_SUM, MASTER_ID, MPI_COMM_WORLD);
+  if(rank == MASTER_ID){
+    printf("Integral is %g\n", integral);
+  }
   MPI_Finalize();
   return 0;
 }
