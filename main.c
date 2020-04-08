@@ -45,9 +45,13 @@ int main(int argc, char **argv)
     if (number_of_points == world_size)
     {
       step = (end - begin) / (world_size - 1);
-    } else if (number_of_points > world_size){
+    }
+    else if (number_of_points > world_size)
+    {
       step = (end - begin) / world_size;
-    } else if (number_of_points < world_size) {
+    }
+    else if (number_of_points < world_size)
+    {
       calculate_world = number_of_points;
       step = (end - begin) / (calculate_world - 1);
     }
@@ -57,8 +61,8 @@ int main(int argc, char **argv)
     printf("step = %g\n", step);
 #endif
     int last_point_number = 1;
-    double* begin_end_array = malloc(2* world_size * sizeof(*begin_end_array));
-    double* number_of_points_array = malloc(world_size * sizeof(*number_of_points_array));
+    double *begin_end_array = malloc(2 * world_size * sizeof(*begin_end_array));
+    double *number_of_points_array = malloc(world_size * sizeof(*number_of_points_array));
 
     for (int i = 1; i < calculate_world; i++)
     {
@@ -76,15 +80,16 @@ int main(int argc, char **argv)
       begin_end_array[i + 1] = e;
       number_of_points_array[i] = p;
     }
-    memset(number_of_points_array+calculate_world, 0, world_size - calculate_world);
-    for (int i = calculate_world; i < world_size; i++){
+    memset(number_of_points_array + calculate_world, 0, world_size - calculate_world);
+    for (int i = calculate_world; i < world_size; i++)
+    {
       begin_end_array[i] = 0.0;
       begin_end_array[i + 1] = 0.0;
     }
     double m_b = begin + (calculate_world - 1) * step;
     double m_e = end;
     int m_p = (number_of_points - last_point_number + 1);
-    
+
     begin_end_array[0] = m_b;
     begin_end_array[1] = m_e;
     number_of_points_array[0] = m_p;
@@ -103,7 +108,9 @@ int main(int argc, char **argv)
       partial_integral += tmp;
     }
     printf("Integral is equal to %g\n", partial_integral);
-  } else {
+  }
+  else
+  {
     double begin, end;
     int number_points;
     MPI_Recv(&begin, 1, MPI_DOUBLE, MASTER_ID, BEGIN, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
