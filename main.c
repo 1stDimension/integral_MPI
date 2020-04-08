@@ -19,9 +19,7 @@ int main(int argc, char **argv)
   MPI_Init(&argc, &argv);
 
   int world_size, rank;
-  //How many processes
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-  //Position inside processes
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   double *begin_end_array;
   int *number_of_points_array;
@@ -75,25 +73,14 @@ int main(int argc, char **argv)
     begin_end_array[0] = begin + (calculate_world - 1) * step;
     begin_end_array[1] = end;
     number_of_points_array[0] = (number_of_points - last_point_number + 1);
-    // double partial_integral = 0.0;
 
-    // partial_integral = integrate(func_ptr, m_b, m_e, m_p);
-    // Replace with MPI_GATHER
-    // for (int i = 1; i < world_size; i++)
-    // {
-    // double tmp;
-    // MPI_Recv(&tmp, 1, MPI_DOUBLE, i, RETURN_RESULTS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    // partial_integral += tmp;
-    // }
   }
   double *begin_end = malloc(2 * sizeof(begin_end));
   int number_points;
   MPI_Scatter(begin_end_array, 2, MPI_DOUBLE, begin_end, 2, MPI_DOUBLE, MASTER_ID, MPI_COMM_WORLD);
   MPI_Scatter(number_of_points_array, 1, MPI_INT, &number_points, 1, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
 
-  // printf("I'm %d begin = %g, end = %g, number of points = %d\n",rank, begin_end[0], begin_end[1], number_points);
   double partial_integral = integrate(func_ptr, begin_end[0], begin_end[1], number_points);
-  // printf("I'm %d partial integral is %g\n", rank,partial_integral);
   double integral;
   MPI_Reduce(&partial_integral,&integral, 1, MPI_DOUBLE, MPI_SUM, MASTER_ID, MPI_COMM_WORLD);
   if(rank == MASTER_ID){
