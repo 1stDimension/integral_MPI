@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <mpi.h>
 
 #include "integrals.h"
@@ -56,6 +57,9 @@ int main(int argc, char **argv)
     printf("step = %g\n", step);
 #endif
     int last_point_number = 1;
+    double* begin_end_array = malloc(2* world_size * sizeof(*begin_end_array));
+    double* number_of_points_array = malloc(world_size * sizeof(*number_of_points_array));
+
     for (int i = 1; i < calculate_world; i++)
     {
       // send to i their begin and end and num points
@@ -68,21 +72,22 @@ int main(int argc, char **argv)
 #ifdef DEBUG
       printf("b = %g e = %g p = %d\n", b, e, p);
 #endif
-      MPI_Send(&b, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
-      MPI_Send(&e, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
-      MPI_Send(&p, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
+      begin_end_array[i] = b;
+      begin_end_array[i + 1] = e;
+      number_of_points_array[i] = p;
     }
+    memset(number_of_points_array+calculate_world, 0, world_size - calculate_world);
     for (int i = calculate_world; i < world_size; i++){
-      double tmp = 0;
-      int zero = 0;
-      MPI_Send(&tmp, 1, MPI_DOUBLE, i, BEGIN, MPI_COMM_WORLD);
-      MPI_Send(&tmp, 1, MPI_DOUBLE, i, END, MPI_COMM_WORLD);
-      MPI_Send(&zero, 1, MPI_INT, i, NUM_POINTS, MPI_COMM_WORLD);
-
+      begin_end_array[i] = 0.0;
+      begin_end_array[i + 1] = 0.0;
     }
     double m_b = begin + (calculate_world - 1) * step;
     double m_e = end;
     int m_p = (number_of_points - last_point_number + 1);
+    
+    begin_end_array[0] = m_b;
+    begin_end_array[1] = m_e;
+    number_of_points_array[0] = m_p;
     double partial_integral = 0.0;
     if (m_p > 1)
     {
